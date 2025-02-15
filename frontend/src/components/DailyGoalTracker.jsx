@@ -1,11 +1,44 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { useQuery } from "@tanstack/react-query";
+import { axiosInstance } from "../lib/axios";
 
 export default function DailyGoalTracker() {
-  // This is placeholder data. In a real app, this would be dynamic based on user's intake
-  const dailyGoal = 2000;
-  const currentIntake = 1350;
+  const dailyGoal = 3000; 
+  const {
+    data: dailyCalories,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["dailyCalories"],
+    queryFn: async () => {
+      const response = await axiosInstance.get("/users/get-daily-calorie", {
+        withCredentials: true,
+      });
+      return response.data.calories;
+    },
+  });
+
+  const {
+    data: dailyAverage,
+    isLoading: avgLoading,
+    error: avgError,
+  } = useQuery({
+    queryKey: ["dailyAverage"],
+    queryFn: async () => {
+      const response = await axiosInstance.get("/users/get-daily-avg", {
+        withCredentials: true,
+      });
+      return response.data.dailyAverage;
+    },
+  });
+
+  const currentIntake = dailyCalories || 0;
   const progress = (currentIntake / dailyGoal) * 100;
+
+  if (isLoading || avgLoading) return <p>Loading...</p>;
+  if (error || avgError)
+    return <p className="text-red-500">Failed to load data</p>;
 
   return (
     <Card>
@@ -19,6 +52,12 @@ export default function DailyGoalTracker() {
             <Progress value={progress} className="w-full" />
             <p className="text-sm text-gray-600 mt-2">
               {currentIntake} / {dailyGoal} kcal
+            </p>
+          </div>
+          <div>
+            <h3 className="font-semibold mb-2">Daily Average Intake</h3>
+            <p className="text-sm text-gray-600">
+              {dailyAverage.toFixed(2)} kcal
             </p>
           </div>
           <div>

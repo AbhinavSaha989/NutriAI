@@ -8,7 +8,16 @@ export default function FoodAnalyzer() {
   const [analyzing, setAnalyzing] = useState(false)
   const [analyzed, setAnalyzed] = useState(false)
 
-  
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <Card className="w-full">
@@ -19,7 +28,7 @@ export default function FoodAnalyzer() {
         <div className="flex flex-col items-center space-y-4">
           {imageUrl ? (
             <img
-              src={imageUrl || "/placeholder.svg"}
+              src={imageUrl}
               alt="Uploaded food"
               className="w-full max-w-sm rounded-lg shadow-lg"
             />
@@ -34,6 +43,7 @@ export default function FoodAnalyzer() {
             capture="environment"
             className="hidden"
             id="cameraInput"
+            onChange={handleImageUpload}
           />
           <div className="flex space-x-4">
             <Button onClick={() => document.getElementById("cameraInput")?.click()}>

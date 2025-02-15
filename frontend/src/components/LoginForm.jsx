@@ -5,15 +5,45 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { axiosInstance } from "../lib/axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-
+import { useToast } from "@/hooks/use-toast";
 
 export function LoginForm({ className, ...props }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  
+  const { toast } = useToast();
+
+  const queryClient = useQueryClient();
+
+  const { mutate: loginUser, isLoading } = useMutation({
+    mutationFn: async (data) => {
+      const response = await axiosInstance.post("/users/login", data);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Success",
+        description: data.message,
+      });
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Uh oh! Something went wrong.",
+        description: error.response.data.message,
+      });
+    },
+  });
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    loginUser({ username, password });
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -21,7 +51,7 @@ export function LoginForm({ className, ...props }) {
           <CardTitle className="text-xl">Welcome back</CardTitle>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleLogin}>
             <div className="grid gap-6">
               <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border"></div>
               <div className="grid gap-6">
