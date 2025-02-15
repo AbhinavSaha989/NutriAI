@@ -80,28 +80,6 @@ export default function DailyGoalTracker() {
                 {avgIntake.toFixed(2)} kcal
               </p>
             </div>
-            <div>
-              <h3 className="font-semibold mb-2">Nutrient Breakdown</h3>
-              <ul className="space-y-2">
-                <li className="flex justify-between">
-                  <span>Protein</span>
-                  <span>{authUser ? "60g / 100g" : "50g / 100g"}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Carbs</span>
-                  <span>{authUser ? "150g / 250g" : "130g / 250g"}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Fat</span>
-                  <span>{authUser ? "45g / 65g" : "40g / 65g"}</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Fiber</span>
-                  <span>{authUser ? "45g / 65g" : "40g / 65g"}</span>
-                </li>
-                
-              </ul>
-            </div>
           </div>
         </CardContent>
       </Card>
