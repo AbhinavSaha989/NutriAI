@@ -106,7 +106,7 @@ const signupUser = async (req, res) => {
     });
     res.cookie("jwt", token, {
       httpOnly: true,
-      sameSite: "none",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
       secure: process.env.NODE_ENV === "production",
       maxAge: 6 * 24 * 60 * 60 * 1000,
     });
@@ -126,14 +126,17 @@ const getDailyAvg = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user || !user.dailyCalories || user.dailyCalories.length === 0) {
-      return res.status(400).json({ message: "No calorie data available" });
+      return res.status(200).json({ dailyAverage: 0 }); // Return 0 instead of error
     }
 
     const totalCalories = user.dailyCalories.reduce(
       (acc, entry) => acc + entry.calories,
       0
     );
-    const dailyAvg = totalCalories / user.dailyCalories.length;
+    const dailyAvg =
+      user.dailyCalories.length > 0
+        ? totalCalories / user.dailyCalories.length
+        : 0;
 
     res.status(200).json({
       message: "Daily Average Fetched Successfully",
@@ -147,8 +150,8 @@ const getDailyAvg = async (req, res) => {
 
 const postDailyCalorie = async (req, res) => {
   try {
-    const calorie = req.body.calorie;
-    if (!calorie || isNaN(calorie)) {
+    let { calorie } = req.body;
+    if (!calorie || isNaN(calorie) || calorie.toString().trim() === "") {
       return res.status(400).json({ message: "Invalid Calorie Value" });
     }
 
@@ -157,13 +160,17 @@ const postDailyCalorie = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const today = new Date().toISOString().split("T")[0]; 
+    const today = new Date().toISOString().split("T")[0];
+
+    if (!user.dailyCalories) {
+      user.dailyCalories = []; // Ensure array exists
+    }
 
     let todayEntry = user.dailyCalories.find((entry) => entry.date === today);
     if (todayEntry) {
-      todayEntry.calories += Number(calorie); 
+      todayEntry.calories += parseFloat(calorie);
     } else {
-      user.dailyCalories.push({ date: today, calories: Number(calorie) }); 
+      user.dailyCalories.push({ date: today, calories: parseFloat(calorie) });
     }
 
     await user.save();
@@ -177,6 +184,7 @@ const postDailyCalorie = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 
 const getUser = async (req, res) => {
   try {

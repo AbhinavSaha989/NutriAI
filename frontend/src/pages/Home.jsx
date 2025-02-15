@@ -3,6 +3,7 @@ import FoodAnalyzer from "@/components/FoodAnalyzer";
 import DailyGoalTracker from "@/components/DailyGoalTracker";
 
 export default function Home() {
+  
   return (
     <div className="min-h-screen ">
       <Header />

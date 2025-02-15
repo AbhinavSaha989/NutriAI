@@ -2,9 +2,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../lib/axios";
+import { Lock } from "lucide-react"; // Importing the lock icon
 
 export default function DailyGoalTracker() {
-  const dailyGoal = 3000; 
+  const dailyGoal = 3000;
+
+  const { data: authUser, isLoading: authLoading } = useQuery({
+    queryKey: ["authUser"],
+  });
+
   const {
     data: dailyCalories,
     isLoading,
@@ -17,6 +23,7 @@ export default function DailyGoalTracker() {
       });
       return response.data.calories;
     },
+    enabled: !!authUser, // Fetch only if user is authenticated
   });
 
   const {
@@ -31,54 +38,80 @@ export default function DailyGoalTracker() {
       });
       return response.data.dailyAverage;
     },
+    enabled: !!authUser, // Fetch only if user is authenticated
   });
 
-  const currentIntake = dailyCalories || 0;
-  const progress = (currentIntake / dailyGoal) * 100;
+  const currentIntake = authUser ? dailyCalories || 0 : 1500; // Dummy value if not logged in
+  const avgIntake = authUser ? dailyAverage || 0 : 1800; // Dummy value if not logged in
+  const progress =
+    ((currentIntake > dailyGoal ? dailyGoal : currentIntake) / dailyGoal) * 100;
 
-  if (isLoading || avgLoading) return <p>Loading...</p>;
+  if (isLoading || avgLoading || authLoading) return <p>Loading...</p>;
   if (error || avgError)
     return <p className="text-red-500">Failed to load data</p>;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Daily Goal Tracker</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div>
-            <h3 className="font-semibold mb-2">Calorie Intake</h3>
-            <Progress value={progress} className="w-full" />
-            <p className="text-sm text-gray-600 mt-2">
-              {currentIntake} / {dailyGoal} kcal
-            </p>
+    <div className="relative">
+      <Card
+        className={`${
+          !authUser ? "opacity-50 blur-sm pointer-events-none" : ""
+        }`}
+      >
+        <CardHeader>
+          <CardTitle>Daily Goal Tracker</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-semibold mb-2">Calorie Intake</h3>
+              <div className="relative">
+                <Progress value={progress} className="w-full" />
+                {progress >= 100 && (
+                  <div className="absolute inset-0 bg-red-500 rounded-full"></div>
+                )}
+              </div>
+              <p className="text-sm text-gray-600 mt-2">
+                {currentIntake} / {dailyGoal} kcal
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-2">Daily Average Intake</h3>
+              <p className="text-sm text-gray-600">
+                {avgIntake.toFixed(2)} kcal
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-2">Nutrient Breakdown</h3>
+              <ul className="space-y-2">
+                <li className="flex justify-between">
+                  <span>Protein</span>
+                  <span>{authUser ? "60g / 100g" : "50g / 100g"}</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Carbs</span>
+                  <span>{authUser ? "150g / 250g" : "130g / 250g"}</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Fat</span>
+                  <span>{authUser ? "45g / 65g" : "40g / 65g"}</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Fiber</span>
+                  <span>{authUser ? "45g / 65g" : "40g / 65g"}</span>
+                </li>
+                
+              </ul>
+            </div>
           </div>
-          <div>
-            <h3 className="font-semibold mb-2">Daily Average Intake</h3>
-            <p className="text-sm text-gray-600">
-              {dailyAverage.toFixed(2)} kcal
-            </p>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-2">Nutrient Breakdown</h3>
-            <ul className="space-y-2">
-              <li className="flex justify-between">
-                <span>Protein</span>
-                <span>60g / 100g</span>
-              </li>
-              <li className="flex justify-between">
-                <span>Carbs</span>
-                <span>150g / 250g</span>
-              </li>
-              <li className="flex justify-between">
-                <span>Fat</span>
-                <span>45g / 65g</span>
-              </li>
-            </ul>
-          </div>
+        </CardContent>
+      </Card>
+
+      {!authUser && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 text-white font-semibold text-lg p-6 rounded-lg">
+          <Lock size={50} className="mb-2" /> {/* Large lock icon */}
+          Please log in to access daily stats.
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 }
