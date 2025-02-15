@@ -5,17 +5,14 @@ This is the backend for the entire application. It is a Node.js application buil
 ## API Endpoints
 
 ### User Endpoints
-
 - `POST /user/signup`: Creates a new user
 - `POST /user/login`: Logs in an existing user
 - `GET /user/logout`: Logs out the current user
-- `GET /user/me`: Returns the current user's information
+- `GET /user/get-user`: Returns the current user's information
+- `GET /user/get-daily-avg`: Returns the daily calorie average of the user
+- `GET /user/get-daily-calorie`: Returns the daily calorie amount of the user
+- `POST /user/post-daily-calorie`: Adds to the daily calorie amount
 
-### Calorie Endpoints
-
-- `POST /calorie`: Adds a new calorie entry for the current user
-- `GET /calorie/daily`: Returns the current user's daily calorie intake
-- `GET /calorie/weekly`: Returns the current user's weekly calorie intake
 
 ## Database
 

@@ -32,25 +32,6 @@ This application is divided into two main parts: the frontend and the backend. T
 - **JWT**: For authentication.
 - **Mongoose**: For database modeling and interaction.
 
-## API Endpoints
-
-### User Endpoints
-
-- `POST /user/signup`: Creates a new user.
-- `POST /user/login`: Logs in an existing user.
-- `GET /user/logout`: Logs out the current user.
-- `GET /user/me`: Returns the current user's information.
-
-### Calorie Endpoints
-
-- `POST /calorie`: Adds a new calorie entry for the current user.
-- `GET /calorie/daily`: Returns the current user's daily calorie intake.
-- `GET /calorie/weekly`: Returns the current user's weekly calorie intake.
-
-### Image Endpoints
-
-- `POST /image/upload`: Uploads a food image for recognition.
-- `GET /image/analysis`: Returns nutritional information for the recognized food item.
 
 ## Setup and Development
 
