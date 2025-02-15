@@ -2,9 +2,10 @@ import { Button } from "@/components/ui/button";
 import { LogIn, LogOut, Moon, Sun } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { axiosInstance } from "../lib/axios"; // Ensure correct import
+import { axiosInstance } from "../lib/axios"; 
 import useThemeStore from "../store/themeStore";
 import { useToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
 
 export default function Header() {
   const queryClient = useQueryClient();
@@ -12,12 +13,11 @@ export default function Header() {
   const { toast } = useToast();
   const { darkMode, setDarkMode } = useThemeStore();
 
-  // Fetch authenticated user data
   const { data: authUser } = useQuery({
     queryKey: ["authUser"],
   });
 
-  // Logout handler
+ 
   const handleLogout = async () => {
     try {
       const response = await axiosInstance.get("/users/logout", {
@@ -31,7 +31,7 @@ export default function Header() {
         });
 
         queryClient.invalidateQueries({ queryKey: ["authUser"] });
-        navigate("/login"); // Redirect after logout
+        navigate("/login"); 
       }
     } catch (error) {
       console.error("Logout error:", error);
@@ -42,19 +42,30 @@ export default function Header() {
     }
   };
 
-  // Dark mode toggle
   const toggleDarkMode = () => {
     const newMode = !darkMode;
     setDarkMode(newMode);
     document.documentElement.classList.toggle("dark", newMode);
   };
 
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [darkMode]);
+
   return (
     <header className="bg-white dark:bg-zinc-950 shadow border-b border-gray-300 dark:border-zinc-800">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-zinc-50">
-          NutriAI
-        </h1>
+        <Link
+          to={"/"}
+          className="flex items-center space-x-2 text-xl font-bold flex-shrink-0"
+        >
+          <img src="/logo.png" alt="Logo" className="h-10" />
+          <span className="hidden sm:block dark:text-zinc-50">NutriAI</span>
+        </Link>
         <div className="flex items-center space-x-4">
           {/* Dark Mode Toggle */}
           <Button

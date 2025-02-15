@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../lib/axios";
-import { Lock } from "lucide-react"; // Importing the lock icon
+import { Lock } from "lucide-react";
 
 export default function DailyGoalTracker() {
   const dailyGoal = 3000;
@@ -38,7 +38,7 @@ export default function DailyGoalTracker() {
       });
       return response.data.dailyAverage;
     },
-    enabled: !!authUser, // Fetch only if user is authenticated
+    enabled: !!authUser, 
   });
 
   const currentIntake = authUser ? dailyCalories || 0 : 1500; // Dummy value if not logged in
