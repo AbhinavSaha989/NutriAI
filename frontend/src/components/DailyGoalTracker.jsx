@@ -23,7 +23,7 @@ export default function DailyGoalTracker() {
       });
       return response.data.calories;
     },
-    enabled: !!authUser, // Fetch only if user is authenticated
+    enabled: !!authUser,
   });
 
   const {
