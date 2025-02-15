@@ -5,7 +5,7 @@ import { axiosInstance } from "../lib/axios";
 import { Lock } from "lucide-react";
 
 export default function DailyGoalTracker() {
-  const dailyGoal = 3000;
+  const dailyGoal = 2200;
 
   const { data: authUser, isLoading: authLoading } = useQuery({
     queryKey: ["authUser"],
